@@ -52,20 +52,31 @@ namespace weigetools
             string pattern = @"(<tr>[\s\S]*?</tr>)";//"(<p.class=\".*</p>)";
             Regex reg = new Regex(pattern, RegexOptions.Multiline | RegexOptions.IgnoreCase);
             Console.WriteLine(reg.Matches(htmlTablestr).Count);
+            int mintd = 1000;
+            MatchCollection matchtds;
             foreach (Match match in reg.Matches(htmlTablestr))
             {
+                
                 StringBuilder sb =new  StringBuilder();
                 bool flag = true;
-                foreach (Match matchtd in new Regex("(<.*</span>)").Matches(match.Value))
+                matchtds = new Regex("(<.*</span>)").Matches(match.Value);
+                if (matchtds.Count < mintd)
                 {
-                    if (flag&&(new Regex("(<.*</span>)").Matches(match.Value)).Count < 6)
+                    mintd = matchtds.Count;
+                }
+                    foreach (Match matchtd in matchtds)
+                {
+                    if (flag&&matchtds.Count == mintd)
                     {
                         flag = false;
                         sb.Append("  ↑  " + "->");
                     }
                     sb.Append((new Regex(">(.*)</span>").Match(matchtd.Value).Value.Replace(">", "").Substring(0, (new Regex(">(.*)</span>").Match(matchtd.Value).Value.Replace(">", "").IndexOf("<")))).Trim()+"->");
                 }
-                
+                if (sb.ToString().Contains("与昨日相比"))
+                {
+                    sb.Insert(0, "\r\n");
+                }
                 Console.WriteLine(sb.ToString().TrimEnd('>').TrimEnd('-'));
             }
             return null;
