@@ -17,8 +17,8 @@ namespace weigetools
         static void Main(string[] args)
         {
             webc.Encoding = Encoding.GetEncoding("UTF-8");
-           string priceUrl = GetModPriceUrl();
-           Console.WriteLine("原粮价格_玉米价格地址："+ priceUrl);
+            string priceUrl = GetModPriceUrl();
+            Console.WriteLine("原粮价格_玉米价格地址："+ priceUrl);
             GetTableByHtml("http://"+ priceUrl);
             Console.Read();
         }
@@ -55,21 +55,18 @@ namespace weigetools
             foreach (Match match in reg.Matches(htmlTablestr))
             {
                 StringBuilder sb =new  StringBuilder();
+                bool flag = true;
                 foreach (Match matchtd in new Regex("(<.*</span>)").Matches(match.Value))
                 {
-                   // string title = "";
-                    //if ((new Regex("(<.*</span>)").Matches(matchtd.Value)).Count < 6)
-                    //{
-                    //    sb.Append(title.PadLeft(10));
-                    //}
-                    //else if(string.IsNullOrEmpty(title))
-                    //{
-                    //    title = (new Regex(">(.*)</span>").Match(matchtd.Value).Value.Replace(">", "").Substring(0, (new Regex(">(.*)</span>").Match(matchtd.Value).Value.Replace(">", "").IndexOf("<"))));
-                    //}
-                    sb.Append((new Regex(">(.*)</span>").Match(matchtd.Value).Value.Replace(">", "").Substring(0, (new Regex(">(.*)</span>").Match(matchtd.Value).Value.Replace(">", "").IndexOf("<")))).PadLeft(6));
+                    if (flag&&(new Regex("(<.*</span>)").Matches(match.Value)).Count < 6)
+                    {
+                        flag = false;
+                        sb.Append("  ↑  " + "->");
+                    }
+                    sb.Append((new Regex(">(.*)</span>").Match(matchtd.Value).Value.Replace(">", "").Substring(0, (new Regex(">(.*)</span>").Match(matchtd.Value).Value.Replace(">", "").IndexOf("<")))).Trim()+"->");
                 }
                 
-                Console.WriteLine(sb.ToString());
+                Console.WriteLine(sb.ToString().TrimEnd('>').TrimEnd('-'));
             }
             return null;
         }
